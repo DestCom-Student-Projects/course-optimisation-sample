@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     string filePath1 = argv[1];
     string filePath2 = argv[2];
 
-    compareFilesMD5(filePath1, filePath2);
+    calculate_and_compare_image(filePath1, filePath2);
 
     return EXIT_SUCCESS;
 }

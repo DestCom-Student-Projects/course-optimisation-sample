@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstring> 
 #include <openssl/md5.h>
+#include <SceneLoader.hpp>
 
 using namespace std;
 
@@ -61,4 +62,20 @@ void compareFilesMD5(const string &filePath1, const string &filePath2) {
     } else {
         cout << "Files " << filePath1 << " and " << filePath2 << " are identical." << endl;
     }
+}
+
+void calculate_and_compare_image(const string &filePath1, const string &filePath2) {
+    auto [scene, camera, image] = SceneLoader::Load(filePath1);
+
+    std::string outpath = "./tested_gen.png";
+    camera->render(*image, *scene);
+
+    image->writeFile(outpath);
+
+    delete scene;
+    delete camera;
+    delete image;
+
+
+    compareFilesMD5(outpath, filePath2);
 }

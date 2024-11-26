@@ -13,7 +13,13 @@ find_package(OpenSSL REQUIRED)
 add_executable(raytracer main.cpp)
 
 add_executable(image_compare ./tests/image_compare.cpp)
-target_link_libraries(image_compare OpenSSL::SSL OpenSSL::Crypto)
+
+target_include_directories(image_compare PUBLIC
+                           "${PROJECT_BINARY_DIR}"
+                           "${PROJECT_SOURCE_DIR}/src/raymath"
+                           "${PROJECT_SOURCE_DIR}/src/rayimage"
+                           "${PROJECT_SOURCE_DIR}/src/rayscene"
+                           )
 
 
 target_include_directories(raytracer PUBLIC
@@ -22,6 +28,7 @@ target_include_directories(raytracer PUBLIC
                            "${PROJECT_SOURCE_DIR}/src/rayimage"
                            "${PROJECT_SOURCE_DIR}/src/rayscene"
                            )
+
 
 add_subdirectory(./src/raymath)
 add_subdirectory(./src/rayimage)
@@ -35,6 +42,8 @@ target_link_libraries(raytracer
                       rayimage
                       lodepng
                       )
+
+target_link_libraries(image_compare OpenSSL::SSL OpenSSL::Crypto rayscene raymath rayimage lodepng)
 
 # Verify a normal case 
 add_test(NAME global_test COMMAND ./raytracer ../scenes/two-spheres-on-plane.json two-spheres-on-plane-builded.png)
@@ -61,10 +70,5 @@ add_test(NAME resolution_check
 set_tests_properties(resolution_check
         PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+x[0-9]+ pixels")
 
-#Compare the generated image with the wanted image
-#Create a wanted image
-add_test(NAME create_wanted_image
-        COMMAND raytracer ../scenes/two-spheres-on-plane.json to_check.png)
-#Compare the generated image with the wanted image
 add_test(NAME image_compare_test
-        COMMAND image_compare ./to_check.png ../tests/wanted.png)
+        COMMAND image_compare ../scenes/two-spheres-on-plane.json ../tests/iso_image/two-spheres-on-plane.png)
