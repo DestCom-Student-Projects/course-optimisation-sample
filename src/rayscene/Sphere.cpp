@@ -17,24 +17,6 @@ void Sphere::applyTransform()
   this->center = this->transform.apply(c);
 }
 
-void Sphere::countPrimes() {
- int prime_counter = 0;
- for(int n = 2 ; n<1000 ; n++)
-  {
-    int count = 0;
-    for (int i = 2; i <= i/2; i++)
-    {
-      if(n%i == 0) {
-        count++;
-      }
-      if(count == 0)
-      {
-        prime_counter++;
-      }  
-    }
-  }
-}
-
 bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
   // Vector from ray origin to center of sphere
@@ -62,7 +44,8 @@ bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
   }
 
   // Calculate the exact point of collision: P1
-  double a = sqrt(radius * radius - distance * distance);
+  double aSquared = radius * radius - distance * distance;
+  double a = (aSquared > 0) ? std::sqrt(aSquared) : 0.0;
   double t = OP.length() - a;
   Vector3 P1 = r.GetPosition() + (r.GetDirection() * t);
 
@@ -70,9 +53,6 @@ bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
   intersection.Position = P1;
   intersection.Mat = this->material;
   intersection.Normal = (P1 - center).normalize();
-
-  // Junk function!!
-  countPrimes();
 
   return true;
 }

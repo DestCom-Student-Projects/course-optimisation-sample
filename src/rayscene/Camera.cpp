@@ -43,12 +43,14 @@ void Camera::setPosition(Vector3 &pos)
  */
 void renderSegment(RenderSegment *segment)
 {
+  int width = segment->image->width;
+  double halfHeight = segment->height * 0.5;
 
   for (int y = segment->rowMin; y < segment->rowMax; ++y)
   {
-    double yCoord = (segment->height / 2.0) - (y * segment->intervalY);
+    double yCoord = halfHeight - (y * segment->intervalY);
 
-    for (int x = 0; x < segment->image->width; ++x)
+    for (int x = 0; x < width; ++x)
     {
       double xCoord = -0.5 + (x * segment->intervalX);
 

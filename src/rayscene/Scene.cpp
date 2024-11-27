@@ -31,9 +31,9 @@ void Scene::addLight(Light *light)
 
 void Scene::prepare()
 {
-  for (int i = 0; i < objects.size(); ++i)
+  for (auto &object : objects)
   {
-    objects[i]->applyTransform();
+    object->applyTransform();
   }
 }
 

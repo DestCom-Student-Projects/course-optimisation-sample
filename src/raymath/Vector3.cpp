@@ -72,11 +72,12 @@ const Vector3 Vector3::normalize() const
 {
   double length = this->length();
 
-  if (length == 0)
+  if (length == 0.0)
   {
     return Vector3();
   }
-  return *this / length;
+  double invLength = 1.0 / length;
+  return *this * invLength;
 }
 
 double Vector3::dot(Vector3 const &vec) const

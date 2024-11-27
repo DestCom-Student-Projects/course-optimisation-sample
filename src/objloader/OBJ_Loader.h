@@ -121,7 +121,8 @@ namespace objl
 		// Float Division Operator Overload
 		Vector3 operator/(const float& other) const
 		{
-			return Vector3(this->X / other, this->Y / other, this->Z / other);
+			float inverse = 1.0f / other;
+			return Vector3(this->X * inverse, this->Y * inverse, this->Z * inverse);
 		}
 
 		// Positional Variables
@@ -946,7 +947,7 @@ namespace objl
 					}
 
 					// If Vertex is not an interior vertex
-					float angle = math::AngleBetweenV3(pPrev.Position - pCur.Position, pNext.Position - pCur.Position) * (180 / 3.14159265359);
+					float angle = math::AngleBetweenV3(pPrev.Position - pCur.Position, pNext.Position - pCur.Position) * (180 * 0.31830988618);					
 					if (angle <= 0 && angle >= 180)
 						continue;
 

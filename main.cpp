@@ -34,12 +34,17 @@ int main(int argc, char *argv[])
   auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 
   std::cout << "Done." << std::endl;
-  std::printf("Total time: %.3f seconds.\n", elapsed.count() * 1e-9);
+  const double NANOSECONDS_TO_SECONDS = 1.0 * 1e-9;
+  std::printf("Total time: %.3f seconds.\n", elapsed.count() * NANOSECONDS_TO_SECONDS);
 
   std::cout << "Writing file: " << outpath << std::endl;
   image->writeFile(outpath);
 
+  std::cout << "Cleaning up..." << std::endl;
+
   delete scene;
   delete camera;
   delete image;
+
+  std::cout << "Done. Goodbye!" << std::endl;
 }
