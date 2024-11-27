@@ -3,6 +3,10 @@
 #include "Camera.hpp"
 #include "../raymath/Ray.hpp"
 
+#ifdef MULTITHREAD_ON
+#include <thread>
+#endif
+
 struct RenderSegment
 {
 public:
@@ -66,6 +70,7 @@ void renderSegment(RenderSegment *segment)
 
 void Camera::render(Image &image, Scene &scene)
 {
+  
 
   double ratio = (double)image.width / (double)image.height;
   double height = 1.0 / ratio;
@@ -75,16 +80,43 @@ void Camera::render(Image &image, Scene &scene)
 
   scene.prepare();
 
-  RenderSegment *seg = new RenderSegment();
-  seg->height = height;
-  seg->image = &image;
-  seg->scene = &scene;
-  seg->intervalX = intervalX;
-  seg->intervalY = intervalY;
-  seg->reflections = Reflections;
-  seg->rowMin = 0;
-  seg->rowMax = image.height;
-  renderSegment(seg);
+  #ifdef MULTITHREAD_ON
+    unsigned int nthreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+
+    std::cout << "Using " << nthreads << " threads." << std::endl;
+    for (unsigned int i = 0; i < nthreads; i++)
+    {
+      RenderSegment *seg = new RenderSegment();
+      seg->height = height;
+      seg->image = &image;
+      seg->scene = &scene;
+      seg->intervalX = intervalX;
+      seg->intervalY = intervalY;
+      seg->reflections = Reflections;
+      seg->rowMin = i * (image.height / nthreads);
+      seg->rowMax = (i + 1) * (image.height / nthreads);
+      threads.push_back(std::thread(renderSegment, seg));
+    }
+
+    for (unsigned int i = 0; i < nthreads; i++)
+    {
+      threads[i].join();
+    }
+  #else
+    std::cout << "Using 1 thread." << std::endl;
+    RenderSegment *seg = new RenderSegment();
+    seg->height = height;
+    seg->image = &image;
+    seg->scene = &scene;
+    seg->intervalX = intervalX;
+    seg->intervalY = intervalY;
+    seg->reflections = Reflections;
+    seg->rowMin = 0;
+    seg->rowMax = image.height;
+    renderSegment(seg);
+  #endif
+
 }
 
 std::ostream &operator<<(std::ostream &_stream, Camera &cam)

@@ -6,9 +6,21 @@ project(raytracer VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 #add openssl
 find_package(OpenSSL REQUIRED)
+
+option(MULTITHREAD_ON "Enable multithreading for rendering" ON)
+
+if(MULTITHREAD_ON)
+        #Print that multithreading is enabled
+        message(STATUS "Multithreading enabled")
+        add_definitions(-DMULTITHREAD_ON)
+
+        #add threads
+        find_package(Threads REQUIRED)
+endif()
 
 add_executable(raytracer main.cpp)
 
@@ -41,9 +53,10 @@ target_link_libraries(raytracer
                       raymath
                       rayimage
                       lodepng
+                      $<$<BOOL:${MULTITHREAD_ON}>:Threads::Threads>
                       )
 
-target_link_libraries(image_compare OpenSSL::SSL OpenSSL::Crypto rayscene raymath rayimage lodepng)
+target_link_libraries(image_compare OpenSSL::SSL OpenSSL::Crypto rayscene raymath rayimage lodepng $<$<BOOL:${MULTITHREAD_ON}>:Threads::Threads>)
 
 # Verify a normal case 
 add_test(NAME global_test COMMAND ./raytracer ../scenes/two-spheres-on-plane.json two-spheres-on-plane-builded.png)
