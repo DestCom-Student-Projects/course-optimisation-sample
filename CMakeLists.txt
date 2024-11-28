@@ -22,6 +22,14 @@ if(MULTITHREAD_ON)
         find_package(Threads REQUIRED)
 endif()
 
+option(AABB_ON "Enable AABB for rendering" ON)
+if (AABB_ON)
+        #Print that AABB is enabled
+        message(STATUS "AABB enabled")
+        add_definitions(-DAABB_ON)
+endif()
+
+
 add_executable(raytracer main.cpp)
 
 add_executable(image_compare ./tests/image_compare.cpp)

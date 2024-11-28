@@ -64,20 +64,41 @@ void Mesh::applyTransform()
         triangles[i]->material = this->material;
         triangles[i]->transform = transform;
         triangles[i]->applyTransform();
+
+        #ifdef AABB_ON
+        triangles[i]->updateBoundingBox();
+        #endif
     }
+
+    #ifdef AABB_ON
+    updateBoundingBox();
+    #endif
 }
 
 bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
-    Intersection tInter;
+    #ifdef AABB_ON
+    if (!boundingBox.intersects(r))
+    {
+        return false;
+    }
+    #endif
 
+    Intersection tInter;
     double closestDistance = -1;
     Intersection closestInter;
+
     for (int i = 0; i < triangles.size(); ++i)
     {
+        #ifdef AABB_ON
+        if (!triangles[i]->boundingBox.intersects(r))
+        {
+            continue;
+        }
+        #endif
+
         if (triangles[i]->intersects(r, tInter, culling))
         {
-
             tInter.Distance = (tInter.Position - r.GetPosition()).length();
             if (closestDistance < 0 || tInter.Distance < closestDistance)
             {
@@ -95,3 +116,21 @@ bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)
     intersection = closestInter;
     return true;
 }
+
+
+#ifdef AABB_ON
+void Mesh::updateBoundingBox()
+{
+    if (triangles.empty())
+    {
+        return;
+    }
+
+    boundingBox = triangles[0]->boundingBox;
+
+    for (int i = 1; i < triangles.size(); ++i)
+    {
+        boundingBox.subsume(triangles[i]->boundingBox);
+    }
+}
+#endif

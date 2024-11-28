@@ -17,6 +17,21 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
+  std::cout << "-----------------------------------" << std::endl;
+  std::cout << "Optimizations:" << std::endl;
+  #ifdef AABB_ON
+  std::cout << "AABB is ON." << std::endl;
+  #else
+  std::cout << "AABB is OFF." << std::endl;
+  #endif
+
+  #ifdef MULTITHREAD_ON
+  std::cout << "Multithreading is ON." << std::endl;
+  #else
+  std::cout << "Multithreading is OFF." << std::endl;
+  #endif
+  std::cout << "-----------------------------------" << std::endl;
+
   std::string path = argv[1];
   auto [scene, camera, image] = SceneLoader::Load(path);
 

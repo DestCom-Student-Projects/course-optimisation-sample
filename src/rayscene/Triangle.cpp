@@ -6,6 +6,9 @@
 
 Triangle::Triangle(Vector3 a, Vector3 b, Vector3 c) : SceneObject(), A(a), B(b), C(c)
 {
+  #ifdef AABB_ON
+    updateBoundingBox();
+  #endif
 }
 
 Triangle::~Triangle()
@@ -17,10 +20,22 @@ void Triangle::applyTransform()
   tA = this->transform.apply(A);
   tB = this->transform.apply(B);
   tC = this->transform.apply(C);
+
+  #ifdef AABB_ON
+    updateBoundingBox();
+  #endif
 }
 
 bool Triangle::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
+
+  #ifdef AABB_ON
+  if (!boundingBox.intersects(r))
+  {
+    return false;
+  }
+  #endif
+
   Vector3 BA = tB - tA;
   Vector3 CA = tC - tA;
   Vector3 normal = BA.cross(CA).normalize();
@@ -82,3 +97,12 @@ bool Triangle::intersects(Ray &r, Intersection &intersection, CullingType cullin
 
   return true;
 }
+
+#ifdef AABB_ON
+void Triangle::updateBoundingBox()
+{
+  boundingBox = AABB(tA, tA);
+  boundingBox.subsume(AABB(tB, tB));
+  boundingBox.subsume(AABB(tC, tC));
+}
+#endif
